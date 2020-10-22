@@ -1,4 +1,8 @@
 {
+    "viewport": {
+        "width": 640,
+        "height": 480
+    },
     "camera": {
         "position": {
             "x": 1.0,
@@ -10,11 +14,7 @@
             "y": 0.0,
             "z": 0.0
         },
-        "fov": 90.0,
-        "viewport": {
-            "width": 640,
-            "height": 480
-        }
+        "fov": 90.0
     },
     "objects": {
         "sphere": [
@@ -28,7 +28,7 @@
                 "radius": 0.5
             } 
         ],
-        "lights": [
+        "light": [
             {
                 "position": {
                     "x": 0.0,
