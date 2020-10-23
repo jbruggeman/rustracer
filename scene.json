@@ -19,7 +19,11 @@
     "objects": {
         "spheres": [
             {
-                "color": "0xFF0000",
+                "color": {
+                    "r": 255,
+                    "g": 0,
+                    "b": 0
+                },
                 "position": {
                     "x": 0.0,
                     "y": 0.0,

@@ -7,5 +7,7 @@ fn main() {
 
     println!("Scene: {}", scene_str);
 
-    let scene = json_to_scene(&scene_str);
+    let scene = json_to_scene(&scene_str).expect("Error parsing JSON");
+
+    println!("Scene width: {}", scene.viewport.width);
 }
