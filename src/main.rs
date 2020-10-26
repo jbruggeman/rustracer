@@ -9,10 +9,10 @@ fn main() {
         .expect("Something went wrong reading the file");
 
     let scene = scene::Scene::from_json(&scene_str).expect("Error parsing JSON");
-    let mut img = Image::new(scene.viewport.width, scene.viewport.height);
+    let mut img = Image::new(scene.output_image.width, scene.output_image.height);
 
     for (x, y) in img.coordinates() {
-        let color: scene::Color = scene::compute_pixel_from_scene(&scene);
+        let color: scene::Color = scene::compute_pixel_from_scene(&scene, x, y);
         img.set_pixel(x, y, px!(color.r, color.g, color.b));
     }
 

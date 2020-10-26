@@ -1,7 +1,12 @@
 {
-    "viewport": {
+    "output_image": {
         "width": 640,
         "height": 480
+    },
+    "viewport": {
+        "distance": 0.25,
+        "width": 0.5,
+        "height": 0.5
     },
     "camera": {
         "position": {
@@ -13,8 +18,7 @@
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "fov": 90.0
+        }
     },
     "objects": {
         "spheres": [
