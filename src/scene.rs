@@ -111,7 +111,7 @@ impl Scene {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+//#[derive(Copy, Clone, Debug)]
 pub struct PointVector {
     pub origin: Point,
     pub slope: Point
@@ -126,7 +126,7 @@ impl PointVector {
         }
     }
 
-    fn point_from_origin(self, distance: &f64) -> Point {
+    fn point_from_origin(&self, distance: &f64) -> Point {
         let scalar_value: f64 = distance.powi(2) / (self.slope.x.powi(2) + self.slope.y.powi(2) + self.slope.z.powi(2));
         let scalar_vector: Point = self.slope * scalar_value;
         
