@@ -83,27 +83,27 @@ fn raw_viewport_vector_central_unit_vector() -> PointVector {
 
 fn compute_ray(scene: &Scene, x: u32, y: u32) -> PointVector {
     let raw_viewport_vector: PointVector = raw_viewport_vector_for_pixel(&scene, x, y);
-    println!("Raw Viewport Vector: {:?}", raw_viewport_vector);
+    //println!("Raw Viewport Vector: {:?}", raw_viewport_vector);
 
-    println!("Raw Viewport Unit Vector: {:?}", raw_viewport_vector.to_unit_vector().vec);
+    //println!("Raw Viewport Unit Vector: {:?}", raw_viewport_vector.to_unit_vector().vec);
 
-    println!("Central Raw viewport unit vector {:?}", raw_viewport_vector_central_unit_vector());
+    //println!("Central Raw viewport unit vector {:?}", raw_viewport_vector_central_unit_vector());
 
     let central_ray_vector: PointVector = PointVector::from_points(
         &scene.camera.position,
         &scene.camera.target
     );
-    println!("central_ray_vector: {:?}", central_ray_vector);
+    //println!("central_ray_vector: {:?}", central_ray_vector);
 
     let central_ray_unit_vector: PointVector = central_ray_vector.to_unit_vector();
-    println!("central_ray_unit_vector: {:?}", central_ray_unit_vector);
+    //println!("central_ray_unit_vector: {:?}", central_ray_unit_vector);
 
     let rotation_vector : Point = central_ray_unit_vector.vec - raw_viewport_vector_central_unit_vector().vec;
-    println!("rotation_vector: {:?}", rotation_vector);
+    //println!("rotation_vector: {:?}", rotation_vector);
 
     let pixel_vector = raw_viewport_vector.to_unit_vector().vec + rotation_vector;
     let pixel_unit_vector = PointVector::from_vector(&pixel_vector).to_unit_vector();
-    println!("pixel_vector: {:?}", pixel_unit_vector);
+    //println!("pixel_vector: {:?}", pixel_unit_vector);
 
     PointVector {
         origin: scene.camera.position,
