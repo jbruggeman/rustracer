@@ -15,6 +15,13 @@ impl std::fmt::Display for PointVector {
 }
 
 impl PointVector {
+    fn from_vector(v: &Point) -> PointVector {
+        PointVector {
+            origin: Point::zero(),
+            vec: *v
+        }
+    }
+
     fn from_points(origin: &Point, target: &Point) -> PointVector {
         let v : Point = *target - *origin;
 
@@ -56,32 +63,20 @@ impl std::ops::Mul<f64> for PointVector {
 fn raw_viewport_vector_for_pixel(scene: &Scene, x: u32, y:u32) -> PointVector {
     let viewport_vector : Point = Point {
         x: scene.viewport.width * ((x as f64) / ((scene.output_image.width - 1) as f64)) - (scene.viewport.width / 2.0),
-        y: scene.viewport.height * ((y as f64) / ((scene.output_image.height - 1) as f64)) - (scene.viewport.height / 2.0),
+        y: (scene.viewport.height / 2.0) - scene.viewport.height * ((y as f64) / ((scene.output_image.height - 1) as f64)),
         z: scene.viewport.distance
     };
 
     PointVector {
-        origin: Point {
-            x: 0.0,
-            y: 0.0,
-            z: 0.0
-        },
+        origin: Point::zero(),
         vec: viewport_vector
     }
 }
 
 fn raw_viewport_vector_central_unit_vector() -> PointVector {
     PointVector {
-        origin: Point {
-            x: 0.0,
-            y: 0.0,
-            z: 0.0
-        },
-        vec: Point {
-            x: 0.0,
-            y: 0.0,
-            z: 1.0
-        }
+        origin: Point::zero(),
+        vec: Point::from(0.0, 0.0, 1.0)
     }
 }
 
@@ -90,7 +85,9 @@ fn compute_ray(scene: &Scene, x: u32, y: u32) -> PointVector {
     let raw_viewport_vector: PointVector = raw_viewport_vector_for_pixel(&scene, x, y);
     println!("Raw Viewport Vector: {:?}", raw_viewport_vector);
 
-    println!("Raw viewport unit vector {:?}", raw_viewport_vector_central_unit_vector());
+    println!("Raw Viewport Unit Vector: {:?}", raw_viewport_vector.to_unit_vector().vec);
+
+    println!("Central Raw viewport unit vector {:?}", raw_viewport_vector_central_unit_vector());
 
     let central_ray_vector: PointVector = PointVector::from_points(
         &scene.camera.position,
@@ -104,12 +101,13 @@ fn compute_ray(scene: &Scene, x: u32, y: u32) -> PointVector {
     let rotation_vector : Point = central_ray_unit_vector.vec - raw_viewport_vector_central_unit_vector().vec;
     println!("rotation_vector: {:?}", rotation_vector);
 
-    let pixel_unit_vector = raw_viewport_vector.to_unit_vector().vec + rotation_vector;
-    println!("pixel_unit_vector: {:?}", pixel_unit_vector);
+    let pixel_vector = raw_viewport_vector.to_unit_vector().vec + rotation_vector;
+    let pixel_unit_vector = PointVector::from_vector(&pixel_vector).to_unit_vector();
+    println!("pixel_vector: {:?}", pixel_unit_vector);
 
     PointVector {
         origin: scene.camera.position,
-        vec: pixel_unit_vector * raw_viewport_vector.length()
+        vec: pixel_unit_vector.vec * raw_viewport_vector.length()
     }
 }
 

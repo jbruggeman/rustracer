@@ -7,6 +7,23 @@ pub struct Point {
     pub z: f64,
 }
 
+impl Point {
+    pub fn zero() -> Point {
+        Point {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0
+        }
+    }
+    pub fn from(x: f64, y: f64, z: f64) -> Point {
+        Point {
+            x: x,
+            y: y,
+            z: z
+        }
+    }
+}
+
 impl std::fmt::Display for Point {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "( {}, {}, {} )", self.x, self.y, self.z)
