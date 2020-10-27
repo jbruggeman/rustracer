@@ -3,23 +3,23 @@ use super::scene::point::Point;
 
 pub struct PointVector {
     pub origin: Point,
-    pub slope: Point
+    pub unit_vector: Point
 }
 
 impl PointVector {
     fn from_points(origin: &Point, target: &Point) -> PointVector {
-        
+        let v : Point = *target - *origin;
+
+        let scalar_value: f64 = (1.0f64.powi(2) / (v.x.powi(2) + v.y.powi(2) + v.z.powi(2))).sqrt();
+
         PointVector {
             origin: *origin,
-            slope: *target - *origin
+            unit_vector: v * scalar_value
         }
     }
 
     fn point_from_origin(&self, distance: &f64) -> Point {
-        let scalar_value: f64 = distance.powi(2) / (self.slope.x.powi(2) + self.slope.y.powi(2) + self.slope.z.powi(2));
-        let scalar_vector: Point = self.slope * scalar_value;
-        
-        self.origin + scalar_vector
+        self.origin + self.unit_vector * (*distance)
     }
 }
 
