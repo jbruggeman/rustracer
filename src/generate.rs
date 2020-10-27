@@ -53,7 +53,7 @@ impl std::ops::Mul<f64> for PointVector {
     }
 }
 
-fn compute_gaze_offset(scene: &Scene, x: u32, y:u32) -> PointVector {
+fn raw_viewport_vector_for_pixel(scene: &Scene, x: u32, y:u32) -> PointVector {
     let viewport_vector : Point = Point {
         x: scene.viewport.width * ((x as f64) / ((scene.output_image.width - 1) as f64)) - (scene.viewport.width / 2.0),
         y: scene.viewport.height * ((y as f64) / ((scene.output_image.height - 1) as f64)) - (scene.viewport.height / 2.0),
@@ -70,7 +70,7 @@ fn compute_gaze_offset(scene: &Scene, x: u32, y:u32) -> PointVector {
     }
 }
 
-fn compute_gaze_offset_central_unit_vector() -> PointVector {
+fn raw_viewport_vector_central_unit_vector() -> PointVector {
     PointVector {
         origin: Point {
             x: 0.0,
@@ -87,30 +87,36 @@ fn compute_gaze_offset_central_unit_vector() -> PointVector {
 
 
 fn compute_ray(scene: &Scene, x: u32, y: u32) -> PointVector {
-    let gaze_offset: PointVector = compute_gaze_offset(&scene, x, y);
-    println!("Gaze offset: {:?}", gaze_offset);
+    let raw_viewport_vector: PointVector = raw_viewport_vector_for_pixel(&scene, x, y);
+    println!("Raw Viewport Vector: {:?}", raw_viewport_vector);
+
+    println!("Raw viewport unit vector {:?}", raw_viewport_vector_central_unit_vector());
 
     let central_ray_vector: PointVector = PointVector::from_points(
         &scene.camera.position,
         &scene.camera.target
     );
+    println!("central_ray_vector: {:?}", central_ray_vector);
 
     let central_ray_unit_vector: PointVector = central_ray_vector.to_unit_vector();
+    println!("central_ray_unit_vector: {:?}", central_ray_unit_vector);
 
-    let rotation_vector : Point = central_ray_unit_vector.vec - compute_gaze_offset_central_unit_vector().vec;
+    let rotation_vector : Point = central_ray_unit_vector.vec - raw_viewport_vector_central_unit_vector().vec;
+    println!("rotation_vector: {:?}", rotation_vector);
 
-    //gaze_offset
-    
+    let pixel_unit_vector = raw_viewport_vector.to_unit_vector().vec + rotation_vector;
+    println!("pixel_unit_vector: {:?}", pixel_unit_vector);
 
-    let central_point_of_viewport: PointVector = central_ray_unit_vector * scene.viewport.distance;
-
-    println!("Debug: {:?}", central_point_of_viewport);
-
-    central_ray_unit_vector
+    PointVector {
+        origin: scene.camera.position,
+        vec: pixel_unit_vector * raw_viewport_vector.length()
+    }
 }
 
 pub fn compute_pixel_from_scene(scene: &Scene, x: u32, y: u32) -> Color {
     let ray: PointVector = compute_ray(&scene, x, y);
+    
+    println!("Debug: {:?}", ray);
     
     Color {
         r: 128,
