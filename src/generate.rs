@@ -1,9 +1,17 @@
 use super::scene::{Scene, Color};
 use super::scene::point::Point;
 
+#[derive(Debug)]
 pub struct PointVector {
     pub origin: Point,
     pub vec: Point
+}
+
+impl std::fmt::Display for PointVector {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "Origin: ( {}, {}, {} ) Vector: ( {}, {}, {} )", 
+            self.origin.x, self.origin.y, self.origin.z, self.vec.x, self.vec.y, self.vec.z)
+    }
 }
 
 impl PointVector {
@@ -23,14 +31,21 @@ impl PointVector {
     }
 }
 
-pub fn compute_gaze_offset(scene: &Scene, x: u32, y:u32) -> Point {
+pub fn compute_gaze_offset(scene: &Scene, x: u32, y:u32) -> PointVector {
     let viewport_vector : Point = Point {
         x: scene.viewport.width * ((x as f64) / ((scene.output_image.width - 1) as f64)) - (scene.viewport.width / 2.0),
         y: scene.viewport.height * ((y as f64) / ((scene.output_image.height - 1) as f64)) - (scene.viewport.height / 2.0),
         z: scene.viewport.distance
     };
 
-    viewport_vector
+    PointVector {
+        origin: Point {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0
+        },
+        vec: viewport_vector
+    }
 }
 
 pub fn compute_ray(scene: &Scene, x: u32, y: u32) -> PointVector {
@@ -43,7 +58,7 @@ pub fn compute_ray(scene: &Scene, x: u32, y: u32) -> PointVector {
 
     println!("Debug: {:?}", central_point_of_viewport);
 
-    let gaze_offset: Point = compute_gaze_offset(&scene, x, y);
+    let gaze_offset: PointVector = compute_gaze_offset(&scene, x, y);
     println!("Gaze offset: {:?}", gaze_offset);
 
     central_ray_unit_vector
