@@ -1,4 +1,4 @@
-use super::scene::{Scene, Color};
+use super::scene::{Scene, Color, Objects, Sphere};
 use super::scene::point::Point;
 
 #[derive(Copy, Clone, Debug)]
@@ -111,14 +111,39 @@ fn compute_ray(scene: &Scene, x: u32, y: u32) -> PointVector {
     }
 }
 
+pub struct Intersection {
+    sphere: Sphere,
+    point: Point
+}
+
+pub fn get_closest_sphere(scene: &Scene, ray: &PointVector) -> Option<Intersection> {
+    let ret = Option::None;
+
+    ret
+}  
+
+pub fn compute_color(scene: &Scene, intersection: &Intersection) -> Color {
+    Color {
+        r: intersection.sphere.color.r,
+        g: intersection.sphere.color.g,
+        b: intersection.sphere.color.b
+    }
+}
+
 pub fn compute_pixel_from_scene(scene: &Scene, x: u32, y: u32) -> Color {
     let ray: PointVector = compute_ray(&scene, x, y);
-    
     println!("Debug: {:?}", ray);
     
-    Color {
-        r: 128,
-        g: 0,
-        b: 128
+    match get_closest_sphere(&scene, &ray) {
+        Some(intersection) => {
+            compute_color(&scene, &intersection)
+        },
+        None => {
+            Color {
+                r: 0,
+                g: 0,
+                b: 0
+            } 
+        }
     }
 }
