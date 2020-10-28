@@ -116,8 +116,59 @@ pub struct Intersection {
     point: Point
 }
 
+pub enum PointsOfIntersection {
+    None,
+    One,
+    Two
+}
+
+pub fn num_points_of_intersection(sphere: &Sphere, ray: &PointVector) -> PointsOfIntersection {
+    let cx = sphere.position.x;
+    let cy = sphere.position.y;
+    let cz = sphere.position.z;
+
+    let p1 = ray.origin;
+
+    let px = p1.x;
+    let py = p1.y;
+    let pz = p1.z;
+    
+    let vx = ray.vec.x;
+    let vy = ray.vec.y;
+    let vz = ray.vec.z;
+        
+    let r = sphere.radius;
+    
+    let a : f64 =  vx * vx + vy * vy + vz * vz;
+    let b : f64 = 2.0 * (px * vx + py * vy + pz * vz - vx * cx - vy * cy - vz * cz);
+    let c : f64 = px * px - 2.0 * px * cx + cx * cx + py * py - 2.0 * py * cy + cy * cy + pz * pz - 2.0 * pz * cz + cz * cz - r * r;
+
+    let d = b * b - 4.0 * a * c;
+ 
+    if d < 0.0 {
+        PointsOfIntersection::None
+    } else if d == 0.0 {
+        PointsOfIntersection::One
+    } else {
+        PointsOfIntersection::Two
+    }
+}
+
 pub fn get_closest_sphere(scene: &Scene, ray: &PointVector) -> Option<Intersection> {
-    let ret = Option::None;
+    let mut ret = Option::None;
+
+    // Hack
+    for sphere in &scene.objects.spheres {
+        match num_points_of_intersection(&sphere, &ray) {
+            PointsOfIntersection::None => (),
+            _ => {
+                ret = Option::Some(Intersection {
+                    sphere: *sphere,
+                    point: Point::zero()
+                });
+            }
+        }
+    }
 
     ret
 }  
@@ -132,7 +183,7 @@ pub fn compute_color(scene: &Scene, intersection: &Intersection) -> Color {
 
 pub fn compute_pixel_from_scene(scene: &Scene, x: u32, y: u32) -> Color {
     let ray: PointVector = compute_ray(&scene, x, y);
-    println!("Debug: {:?}", ray);
+    //println!("Debug: {:?}", ray);
     
     match get_closest_sphere(&scene, &ray) {
         Some(intersection) => {

@@ -29,7 +29,7 @@ pub struct Camera {
     pub target: Point,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Copy, Clone, Debug)]
 pub struct Sphere {
     pub color: Color,
     pub position: Point,

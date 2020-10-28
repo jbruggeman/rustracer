@@ -13,10 +13,10 @@ fn main() {
     let mut img = Image::new(scene.output_image.width, scene.output_image.height);
 
     for (x, y) in img.coordinates() {
-        if (x == 0 && y == 0) || (x == scene.output_image.width - 1 && y == scene.output_image.height - 1) {
+        //if (x == 0 && y == 0) || (x == scene.output_image.width - 1 && y == scene.output_image.height - 1) {
             let color: scene::Color = generate::compute_pixel_from_scene(&scene, x, y);
             img.set_pixel(x, y, px!(color.r, color.g, color.b));
-        }
+        //}
     }
 
     let _ = img.save("output.bmp");
