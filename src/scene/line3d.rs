@@ -1,9 +1,9 @@
-use super::point::Point;
+use super::point3d::Point3D;
 use super::vector3d::Vector3D;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Line3D {
-    pub origin: Point,
+    pub origin: Point3D,
     pub vec: Vector3D
 }
 

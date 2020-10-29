@@ -1,4 +1,4 @@
-use super::point::Point;
+use super::point3d::Point3D;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Vector3D {
@@ -21,11 +21,11 @@ impl Vector3D {
             z: z
         }
     }
-    pub fn from_point(p: &Point) -> Vector3D {
+    pub fn from_point(p: &Point3D) -> Vector3D {
         Vector3D::from(p.x, p.y, p.z)
     }
 
-    pub fn from_points(origin: &Point, target: &Point) -> Vector3D {
+    pub fn from_points(origin: &Point3D, target: &Point3D) -> Vector3D {
         Vector3D::from(target.x - origin.x, target.y - origin.y, target.z - origin.z) 
     }
 

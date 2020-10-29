@@ -1,5 +1,5 @@
 use super::scene::{Scene, Color, Objects, Sphere};
-use super::scene::point::Point;
+use super::scene::point3d::Point3D;
 use super::scene::vector3d::Vector3D;
 use super::scene::line3d::Line3D;
 
@@ -44,16 +44,10 @@ fn compute_ray(scene: &Scene, x: u32, y: u32) -> Line3D {
 
 pub struct Intersection {
     sphere: Sphere,
-    point: Point
+    point: Point3D
 }
 
-pub enum PointsOfIntersection {
-    None,
-    One,
-    Two
-}
-
-pub fn num_points_of_intersection(sphere: &Sphere, ray: &Line3D) -> PointsOfIntersection {
+pub fn closest_point_of_intersection(sphere: &Sphere, ray: &Line3D) -> Option<Point3D> {
     let cx = sphere.position.x;
     let cy = sphere.position.y;
     let cz = sphere.position.z;
@@ -77,11 +71,11 @@ pub fn num_points_of_intersection(sphere: &Sphere, ray: &Line3D) -> PointsOfInte
     let d = b * b - 4.0 * a * c;
  
     if d < 0.0 {
-        PointsOfIntersection::None
+        Option::None
     } else if d == 0.0 {
-        PointsOfIntersection::One
+        Option::Some(Point3D::zero())
     } else {
-        PointsOfIntersection::Two
+        Option::Some(Point3D::zero())
     }
 }
 
@@ -90,14 +84,14 @@ pub fn get_closest_sphere(scene: &Scene, ray: &Line3D) -> Option<Intersection> {
 
     // Hack
     for sphere in &scene.objects.spheres {
-        match num_points_of_intersection(&sphere, &ray) {
-            PointsOfIntersection::One | PointsOfIntersection::Two => {
+        match closest_point_of_intersection(&sphere, &ray) {
+            Some(point) => {
                 ret = Option::Some(Intersection {
                     sphere: *sphere,
-                    point: Point::zero()
+                    point: point
                 });
             },
-            _ => ()
+            None => ()
         }
     }
 
