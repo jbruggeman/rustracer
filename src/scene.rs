@@ -1,6 +1,8 @@
 use serde::Deserialize;
 
 pub mod point;
+pub mod pointvector;
+
 use point::Point;
 
 #[derive(Deserialize, Copy, Clone, Debug)]
