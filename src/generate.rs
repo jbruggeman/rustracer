@@ -91,13 +91,13 @@ pub fn get_closest_sphere(scene: &Scene, ray: &Line3D) -> Option<Intersection> {
     // Hack
     for sphere in &scene.objects.spheres {
         match num_points_of_intersection(&sphere, &ray) {
-            PointsOfIntersection::None => (),
-            _ => {
+            PointsOfIntersection::One | PointsOfIntersection::Two => {
                 ret = Option::Some(Intersection {
                     sphere: *sphere,
                     point: Point::zero()
                 });
-            }
+            },
+            _ => ()
         }
     }
 
