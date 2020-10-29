@@ -1,54 +1,44 @@
 use super::scene::{Scene, Color, Objects, Sphere};
 use super::scene::point::Point;
-use super::scene::pointvector::PointVector;
+use super::scene::vector3d::Vector3D;
+use super::scene::line3d::Line3D;
 
-fn raw_viewport_vector_for_pixel(scene: &Scene, x: u32, y:u32) -> PointVector {
-    let viewport_vector : Point = Point {
-        x: scene.viewport.width * ((x as f64) / ((scene.output_image.width - 1) as f64)) - (scene.viewport.width / 2.0),
-        y: (scene.viewport.height / 2.0) - scene.viewport.height * ((y as f64) / ((scene.output_image.height - 1) as f64)),
-        z: scene.viewport.distance
-    };
-
-    PointVector {
-        origin: Point::zero(),
-        vec: viewport_vector
-    }
+fn get_v_vector(roll: f64) -> Vector3D {
+    // Not implemented yet...
+    assert_eq!(roll, 0.0); 
+    
+    Vector3D::from(0.0, 1.0, 0.0)
 }
 
-fn raw_viewport_vector_central_unit_vector() -> PointVector {
-    PointVector {
-        origin: Point::zero(),
-        vec: Point::from(0.0, 0.0, 1.0)
-    }
-}
-
-
-fn compute_ray(scene: &Scene, x: u32, y: u32) -> PointVector {
-    let raw_viewport_vector: PointVector = raw_viewport_vector_for_pixel(&scene, x, y);
-
-    let central_ray_vector: PointVector = PointVector::from_points(
+fn compute_ray(scene: &Scene, x: u32, y: u32) -> Line3D {
+    // https://en.wikipedia.org/wiki/Ray_tracing_(graphics)#Calculate_rays_for_rectangular_viewport
+    let t: Vector3D = Vector3D::from_points(
         &scene.camera.position,
         &scene.camera.target
     );
 
-    let central_ray_unit_vector: PointVector = central_ray_vector.to_unit_vector();
+    let v: Vector3D = get_v_vector(0.0); 
+    let b: Vector3D = Vector3D::cross_product(&t, &v);
 
-    let rotation_vector : Point = central_ray_unit_vector.vec - raw_viewport_vector_central_unit_vector().vec;
+    let tn = t.normalize();
+    let vn = v.normalize();
+    let bn = Vector3D::cross_product(&tn, &vn);
 
-    let pixel_vector = raw_viewport_vector.to_unit_vector().vec + rotation_vector;
-    let pixel_unit_vector = PointVector::from_vector(&pixel_vector).to_unit_vector();
+    let fov_radians = scene.camera.fov.to_radians();
 
-    /*println!("Raw Viewport Vector: {:?}", raw_viewport_vector);
-    println!("Raw Viewport Unit Vector: {:?}", raw_viewport_vector.to_unit_vector().vec);
-    println!("Central Raw viewport unit vector {:?}", raw_viewport_vector_central_unit_vector());
-    println!("central_ray_vector: {:?}", central_ray_vector);
-    println!("central_ray_unit_vector: {:?}", central_ray_unit_vector);
-    println!("rotation_vector: {:?}", rotation_vector);
-    println!("pixel_vector: {:?}", pixel_unit_vector);*/
-    
-    PointVector {
+    let gx = (fov_radians / 2.0).tan();
+    let gy = gx * ((scene.output_image.height - 1) as f64) / ((scene.output_image.width - 1) as f64);
+
+    let qx = bn * (2.0 * gx / ((scene.output_image.width - 1) as f64));
+    let qy = vn * (2.0 * gy / ((scene.output_image.height - 1) as f64));
+
+    let p1m = tn - bn*gx - vn*gy;
+
+    let pij = p1m + qx * (x as f64) + qy * (y as f64);
+
+    Line3D {
         origin: scene.camera.position,
-        vec: pixel_unit_vector.vec * raw_viewport_vector.length()
+        vec: pij
     }
 }
 
@@ -63,7 +53,7 @@ pub enum PointsOfIntersection {
     Two
 }
 
-pub fn num_points_of_intersection(sphere: &Sphere, ray: &PointVector) -> PointsOfIntersection {
+pub fn num_points_of_intersection(sphere: &Sphere, ray: &Line3D) -> PointsOfIntersection {
     let cx = sphere.position.x;
     let cy = sphere.position.y;
     let cz = sphere.position.z;
@@ -95,7 +85,7 @@ pub fn num_points_of_intersection(sphere: &Sphere, ray: &PointVector) -> PointsO
     }
 }
 
-pub fn get_closest_sphere(scene: &Scene, ray: &PointVector) -> Option<Intersection> {
+pub fn get_closest_sphere(scene: &Scene, ray: &Line3D) -> Option<Intersection> {
     let mut ret = Option::None;
 
     // Hack
@@ -123,7 +113,7 @@ pub fn compute_color(scene: &Scene, intersection: &Intersection) -> Color {
 }
 
 pub fn compute_pixel_from_scene(scene: &Scene, x: u32, y: u32) -> Color {
-    let ray: PointVector = compute_ray(&scene, x, y);
+    let ray: Line3D = compute_ray(&scene, x, y);
     //println!("Debug: {:?}", ray);
     
     match get_closest_sphere(&scene, &ray) {

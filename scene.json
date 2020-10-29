@@ -1,24 +1,20 @@
 {
     "output_image": {
-        "width": 640,
+        "width": 480,
         "height": 480
-    },
-    "viewport": {
-        "distance": 0.5,
-        "width": 0.5,
-        "height": 0.5
     },
     "camera": {
         "position": {
-            "x": 3.0,
-            "y": 3.0,
-            "z": 3.0
+            "x": 5.0,
+            "y": 5.0,
+            "z": 5.0
         },
         "target": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        }
+        },
+        "fov": 90.0
     },
     "objects": {
         "spheres": [

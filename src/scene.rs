@@ -1,7 +1,8 @@
 use serde::Deserialize;
 
 pub mod point;
-pub mod pointvector;
+pub mod vector3d;
+pub mod line3d;
 
 use point::Point;
 
@@ -19,16 +20,10 @@ pub struct OutputImage {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct Viewport {
-    pub width: f64,
-    pub height: f64,
-    pub distance: f64
-}
-
-#[derive(Deserialize, Debug)]
 pub struct Camera {
     pub position: Point,
     pub target: Point,
+    pub fov: f64
 }
 
 #[derive(Deserialize, Copy, Clone, Debug)]
@@ -52,7 +47,6 @@ pub struct Objects {
 #[derive(Deserialize, Debug)]
 pub struct Scene {
     pub output_image: OutputImage,
-    pub viewport: Viewport,
     pub camera: Camera,
     pub objects: Objects
 }

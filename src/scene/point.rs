@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-#[derive(Deserialize, Copy, Clone, Debug)]
+#[derive(Deserialize, Copy, Clone, Debug, PartialOrd, PartialEq)]
 pub struct Point {
     pub x: f64,
     pub y: f64,
