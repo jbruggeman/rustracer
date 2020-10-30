@@ -1,5 +1,5 @@
 # rustracer
-Ray tracer written in rust as an excuse to teach myself some rust.
+Ray tracer written in rust as an excuse to teach myself some rust. This is definitely a work in progress as there's some shadows, but no dynamic lighting and the repo needs some heavy reorganization. 
 
 Feel free to borrow anything from this basic implementation.
 
