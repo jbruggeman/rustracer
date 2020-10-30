@@ -1,7 +1,7 @@
 use super::scene::{Scene, Color, Objects, Sphere};
 use super::scene::point3d::Point3D;
 use super::scene::vector3d::Vector3D;
-use super::scene::line3d::Line3D;
+use super::scene::ray3d::Ray3D;
 
 fn get_v_vector(roll: f64) -> Vector3D {
     // Not implemented yet...
@@ -10,7 +10,7 @@ fn get_v_vector(roll: f64) -> Vector3D {
     Vector3D::from(0.0, 1.0, 0.0)
 }
 
-fn compute_ray(scene: &Scene, x: u32, y: u32) -> Line3D {
+fn compute_ray(scene: &Scene, x: u32, y: u32) -> Ray3D {
     // https://en.wikipedia.org/wiki/Ray_tracing_(graphics)#Calculate_rays_for_rectangular_viewport
     let t: Vector3D = Vector3D::from_points(
         &scene.camera.position,
@@ -36,7 +36,7 @@ fn compute_ray(scene: &Scene, x: u32, y: u32) -> Line3D {
 
     let pij = p1m + qx * (x as f64) + qy * (y as f64);
 
-    Line3D {
+    Ray3D {
         origin: scene.camera.position,
         vec: pij
     }
@@ -48,20 +48,19 @@ pub struct Intersection {
     point: Point3D
 }
 
-pub fn point_is_infront_of_camera(ray: &Line3D, point: &Point3D) -> bool {
+pub fn point_is_infront_of_camera(ray: &Ray3D, point: &Point3D) -> bool {
     // Kind of a hack, but I guess it works.
     
     let distance = Vector3D::from_points(&ray.origin, &point).length();
 
     const SMALLEST_INCREMENT : f64 = 0.000001;    
-    let closer_point = ray.point_on_line(SMALLEST_INCREMENT);
+    let closer_point = ray.point_on_ray(SMALLEST_INCREMENT);
     let closer_distance = Vector3D::from_points(&closer_point, &point).length();
 
     closer_distance < distance
 }
 
-pub fn closest_point_of_intersection(sphere: &Sphere, ray: &Line3D) -> Option<Point3D> {
-    // TODO: What happens if we intersect behind the camera?
+pub fn closest_point_of_intersection(sphere: &Sphere, ray: &Ray3D) -> Option<Point3D> {
     let cx = sphere.position.x;
     let cy = sphere.position.y;
     let cz = sphere.position.z;
@@ -137,10 +136,9 @@ pub fn closest_point_of_intersection(sphere: &Sphere, ray: &Line3D) -> Option<Po
     panic!("Camera is in a sphere! I don't know what to do :(");
 }
 
-pub fn get_closest_sphere(scene: &Scene, ray: &Line3D) -> Option<Intersection> {
+pub fn get_closest_sphere(scene: &Scene, ray: &Ray3D) -> Option<Intersection> {
     let mut closest_sphere = Option::None;
 
-    // Hack
     for sphere in &scene.objects.spheres {
         match closest_point_of_intersection(&sphere, &ray) {
             Some(point) => {
@@ -172,15 +170,47 @@ pub fn get_closest_sphere(scene: &Scene, ray: &Line3D) -> Option<Intersection> {
 }  
 
 pub fn compute_color(scene: &Scene, intersection: &Intersection) -> Color {
-    Color {
-        r: intersection.sphere.color.r,
-        g: intersection.sphere.color.g,
-        b: intersection.sphere.color.b
+    let mut light_is_blocked = false;
+
+    for light in &scene.objects.lights {
+        for sphere in &scene.objects.spheres {
+            if sphere == &intersection.sphere {
+                continue;
+            }
+
+            let line = Ray3D {
+                origin: intersection.point,
+                vec: Vector3D::from_points(&light.position, &intersection.point)
+            };
+
+            println!("v: {:?}", line.vec);
+
+            match closest_point_of_intersection(&sphere, &line) {
+                None => {},
+                Some(intersect) => {
+                    let intersect_vector = Vector3D::from_points(&intersect, &intersection.point);
+                    if intersect_vector.length() < line.vec.length() {
+                        light_is_blocked = true;
+                    }
+                }
+            };
+        }
+    }
+    
+    // Hack, compute from multiple light sources.
+    if !light_is_blocked {
+        Color {
+            r: intersection.sphere.color.r,
+            g: intersection.sphere.color.g,
+            b: intersection.sphere.color.b
+        }
+    } else {
+        Color::black()
     }
 }
 
 pub fn compute_pixel_from_scene(scene: &Scene, x: u32, y: u32) -> Color {
-    let ray: Line3D = compute_ray(&scene, x, y);
+    let ray: Ray3D = compute_ray(&scene, x, y);
     //println!("Debug: {:?}", ray);
     
     match get_closest_sphere(&scene, &ray) {
@@ -188,11 +218,7 @@ pub fn compute_pixel_from_scene(scene: &Scene, x: u32, y: u32) -> Color {
             compute_color(&scene, &intersection)
         },
         None => {
-            Color {
-                r: 0,
-                g: 0,
-                b: 0
-            }
+            Color::black()
         }
     }
 }
