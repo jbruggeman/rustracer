@@ -25,7 +25,7 @@ impl Vector3D {
         Vector3D::from(p.x, p.y, p.z)
     }
 
-    pub fn from_points(origin: &Point3D, target: &Point3D) -> Vector3D {
+    pub fn from_point_to_point(origin: &Point3D, target: &Point3D) -> Vector3D {
         Vector3D::from(target.x - origin.x, target.y - origin.y, target.z - origin.z) 
     }
 

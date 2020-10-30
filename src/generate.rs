@@ -12,7 +12,7 @@ fn get_v_vector(roll: f64) -> Vector3D {
 
 fn compute_ray(scene: &Scene, x: u32, y: u32) -> Ray3D {
     // https://en.wikipedia.org/wiki/Ray_tracing_(graphics)#Calculate_rays_for_rectangular_viewport
-    let t: Vector3D = Vector3D::from_points(
+    let t: Vector3D = Vector3D::from_point_to_point(
         &scene.camera.position,
         &scene.camera.target
     );
@@ -51,11 +51,15 @@ pub struct Intersection {
 pub fn point_is_infront_of_camera(ray: &Ray3D, point: &Point3D) -> bool {
     // Kind of a hack, but I guess it works.
     
-    let distance = Vector3D::from_points(&ray.origin, &point).length();
+    let distance = Vector3D::from_point_to_point(&ray.origin, &point).length();
 
-    const SMALLEST_INCREMENT : f64 = 0.000001;    
+    const SMALLEST_INCREMENT : f64 = 0.000001; 
     let closer_point = ray.point_on_ray(SMALLEST_INCREMENT);
-    let closer_distance = Vector3D::from_points(&closer_point, &point).length();
+    let closer_distance = Vector3D::from_point_to_point(&closer_point, &point).length();
+
+    //println!("Target point: {:?}", point);
+    //println!("ray.origin, {:?} distance: {:?}", ray.origin, distance);
+    //println!("Closer point, {:?}, distance: {:?}", closer_point, closer_distance);
 
     closer_distance < distance
 }
@@ -114,11 +118,17 @@ pub fn closest_point_of_intersection(sphere: &Sphere, ray: &Ray3D) -> Option<Poi
         z: p1.z * ( 1.0 - t2 ) + t2 * p2.z
     };
 
-    let sol1_vec3d = Vector3D::from_points(&ray.origin, &solution1);
-    let sol2_vec3d = Vector3D::from_points(&ray.origin, &solution2);
+    let sol1_vec3d = Vector3D::from_point_to_point(&ray.origin, &solution1);
+    let sol2_vec3d = Vector3D::from_point_to_point(&ray.origin, &solution2);
+
+    //println!("sol1_vec3d {:?}", sol1_vec3d);
+    //println!("sol2_vec3d {:?}", sol2_vec3d);
 
     let solution_1_visible = point_is_infront_of_camera(&ray, &solution1);
     let solution_2_visible = point_is_infront_of_camera(&ray, &solution2);
+    
+    //println!("solution_1_visible {:?}", solution_1_visible);
+    //println!("solution_2_visible {:?}", solution_2_visible);
 
     if !solution_1_visible && !solution_2_visible {
         return Option::None;
@@ -150,8 +160,8 @@ pub fn get_closest_sphere(scene: &Scene, ray: &Ray3D) -> Option<Intersection> {
                         });
                     },
                     Some(current_closest) => {
-                        let current_point = Vector3D::from_points(&ray.origin, &current_closest.point);
-                        let new_point = Vector3D::from_points(&ray.origin, &point);
+                        let current_point = Vector3D::from_point_to_point(&ray.origin, &current_closest.point);
+                        let new_point = Vector3D::from_point_to_point(&ray.origin, &point);
 
                         if new_point.length() < current_point.length() {
                             closest_sphere = Option::Some(Intersection {
@@ -178,18 +188,18 @@ pub fn compute_color(scene: &Scene, intersection: &Intersection) -> Color {
                 continue;
             }
 
-            let line = Ray3D {
+            let light_ray = Ray3D {
                 origin: intersection.point,
-                vec: Vector3D::from_points(&light.position, &intersection.point)
+                vec: Vector3D::from_point_to_point(&intersection.point, &light.position)
             };
 
-            println!("v: {:?}", line.vec);
+            //println!("v: {:?}", light_ray);
 
-            match closest_point_of_intersection(&sphere, &line) {
+            match closest_point_of_intersection(&sphere, &light_ray) {
                 None => {},
-                Some(intersect) => {
-                    let intersect_vector = Vector3D::from_points(&intersect, &intersection.point);
-                    if intersect_vector.length() < line.vec.length() {
+                Some(sphere_intersect) => {
+                    let intersect_vector = Vector3D::from_point_to_point(&light_ray.origin, &sphere_intersect);
+                    if intersect_vector.length() < light_ray.vec.length() {
                         light_is_blocked = true;
                     }
                 }
