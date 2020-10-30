@@ -48,22 +48,6 @@ pub struct Intersection {
     point: Point3D
 }
 
-pub fn point_is_infront_of_camera(ray: &Ray3D, point: &Point3D) -> bool {
-    // Kind of a hack, but I guess it works.
-    
-    let distance = Vector3D::from_point_to_point(&ray.origin, &point).length();
-
-    const SMALLEST_INCREMENT : f64 = 0.000001; 
-    let closer_point = ray.point_on_ray(SMALLEST_INCREMENT);
-    let closer_distance = Vector3D::from_point_to_point(&closer_point, &point).length();
-
-    //println!("Target point: {:?}", point);
-    //println!("ray.origin, {:?} distance: {:?}", ray.origin, distance);
-    //println!("Closer point, {:?}, distance: {:?}", closer_point, closer_distance);
-
-    closer_distance < distance
-}
-
 pub fn closest_point_of_intersection(sphere: &Sphere, ray: &Ray3D) -> Option<Point3D> {
     let cx = sphere.position.x;
     let cy = sphere.position.y;
@@ -104,7 +88,7 @@ pub fn closest_point_of_intersection(sphere: &Sphere, ray: &Ray3D) -> Option<Poi
     };
         
     if d == 0.0 {
-        if point_is_infront_of_camera(&ray, &solution1) {
+        if ray.is_point_on_ray(&solution1) {
             return Option::Some(solution1);
         } else {
             return Option::None;
@@ -124,8 +108,8 @@ pub fn closest_point_of_intersection(sphere: &Sphere, ray: &Ray3D) -> Option<Poi
     //println!("sol1_vec3d {:?}", sol1_vec3d);
     //println!("sol2_vec3d {:?}", sol2_vec3d);
 
-    let solution_1_visible = point_is_infront_of_camera(&ray, &solution1);
-    let solution_2_visible = point_is_infront_of_camera(&ray, &solution2);
+    let solution_1_visible = ray.is_point_on_ray(&solution1);
+    let solution_2_visible = ray.is_point_on_ray(&solution2);
     
     //println!("solution_1_visible {:?}", solution_1_visible);
     //println!("solution_2_visible {:?}", solution_2_visible);

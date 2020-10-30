@@ -20,6 +20,19 @@ impl Ray3D {
     pub fn target_point(&self) -> Point3D {
         self.origin + self.vec.target_point()
     }
+
+    pub fn is_point_on_ray(&self, point: &Point3D) -> bool {
+        // assumes that the point is on line defined by the ray and is not the origin.
+        // Maybe do some checks here?
+        
+        let distance = Vector3D::from_point_to_point(&self.origin, &point).length();
+    
+        const SMALLEST_INCREMENT : f64 = 0.000001; 
+        let closer_point = &self.point_on_ray(SMALLEST_INCREMENT);
+        let closer_distance = Vector3D::from_point_to_point(&closer_point, &point).length();
+
+        closer_distance < distance
+    }
 }
 
 impl std::fmt::Display for Ray3D {
