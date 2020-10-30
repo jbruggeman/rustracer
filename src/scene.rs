@@ -3,7 +3,9 @@ use serde::Deserialize;
 pub mod point3d;
 pub mod vector3d;
 pub mod ray3d;
+pub mod geometry;
 
+use geometry::sphere::Sphere;
 use point3d::Point3D;
 
 #[derive(Deserialize, Copy, Clone, Debug, PartialEq, PartialOrd)]
@@ -34,13 +36,6 @@ pub struct Camera {
     pub position: Point3D,
     pub target: Point3D,
     pub fov: f64
-}
-
-#[derive(Deserialize, Copy, Clone, Debug, PartialEq, PartialOrd)]
-pub struct Sphere {
-    pub color: Color,
-    pub position: Point3D,
-    pub radius: f64
 }
 
 #[derive(Deserialize, Debug)]
