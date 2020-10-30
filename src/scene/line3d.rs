@@ -7,6 +7,21 @@ pub struct Line3D {
     pub vec: Vector3D
 }
 
+impl Line3D {
+    pub fn point_on_line(&self, length: f64) -> Point3D {
+        let new_line = Line3D {
+            origin: self.origin,
+            vec: self.vec.normalize() * length
+        };
+
+        new_line.target_point()
+    }
+
+    pub fn target_point(&self) -> Point3D {
+        self.origin + self.vec.target_point()
+    }
+}
+
 impl std::fmt::Display for Line3D {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "Origin: ( {}, {}, {} ) Vector: ( {}, {}, {} )", 

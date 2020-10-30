@@ -46,6 +46,10 @@ impl Vector3D {
             z: a.x*b.y - a.y*b.x
         }
     }
+
+    pub fn target_point(&self) -> Point3D {
+        Point3D::from(self.x, self.y, self.z)
+    }
 }
 
 impl std::ops::Add<Vector3D> for Vector3D {

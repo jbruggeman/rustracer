@@ -48,6 +48,18 @@ pub struct Intersection {
     point: Point3D
 }
 
+pub fn point_is_infront_of_camera(ray: &Line3D, point: &Point3D) -> bool {
+    // Kind of a hack, but I guess it works.
+    
+    let distance = Vector3D::from_points(&ray.origin, &point).length();
+
+    const SMALLEST_INCREMENT : f64 = 0.000001;    
+    let closer_point = ray.point_on_line(SMALLEST_INCREMENT);
+    let closer_distance = Vector3D::from_points(&closer_point, &point).length();
+
+    closer_distance < distance
+}
+
 pub fn closest_point_of_intersection(sphere: &Sphere, ray: &Line3D) -> Option<Point3D> {
     // TODO: What happens if we intersect behind the camera?
     let cx = sphere.position.x;
@@ -89,7 +101,11 @@ pub fn closest_point_of_intersection(sphere: &Sphere, ray: &Line3D) -> Option<Po
     };
         
     if d == 0.0 {
-        return Option::Some(solution1);
+        if point_is_infront_of_camera(&ray, &solution1) {
+            return Option::Some(solution1);
+        } else {
+            return Option::None;
+        }
     } 
 
     let t2 = ( -b + d.sqrt() ) / ( 2.0 * a );
@@ -102,11 +118,23 @@ pub fn closest_point_of_intersection(sphere: &Sphere, ray: &Line3D) -> Option<Po
     let sol1_vec3d = Vector3D::from_points(&ray.origin, &solution1);
     let sol2_vec3d = Vector3D::from_points(&ray.origin, &solution2);
 
-    if sol1_vec3d.length() < sol2_vec3d.length() {
-        Option::Some(solution1)
-    } else {
-        Option::Some(solution2)
+    let solution_1_visible = point_is_infront_of_camera(&ray, &solution1);
+    let solution_2_visible = point_is_infront_of_camera(&ray, &solution2);
+
+    if !solution_1_visible && !solution_2_visible {
+        return Option::None;
     }
+
+    if solution_1_visible && solution_2_visible {
+        if sol1_vec3d.length() < sol2_vec3d.length() {
+            return Option::Some(solution1);
+        } else {
+            return Option::Some(solution2);
+        }
+    }
+
+    // What to do here. We're in the middle of a sphere...
+    panic!("Camera is in a sphere! I don't know what to do :(");
 }
 
 pub fn get_closest_sphere(scene: &Scene, ray: &Line3D) -> Option<Intersection> {
@@ -164,7 +192,7 @@ pub fn compute_pixel_from_scene(scene: &Scene, x: u32, y: u32) -> Color {
                 r: 0,
                 g: 0,
                 b: 0
-            } 
+            }
         }
     }
 }
