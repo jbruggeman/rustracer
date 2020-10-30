@@ -50,6 +50,14 @@ impl Vector3D {
     pub fn target_point(&self) -> Point3D {
         Point3D::from(self.x, self.y, self.z)
     }
+
+    pub fn angle(v1: &Vector3D, v2: &Vector3D) -> f64 {
+        let dividend = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+        let divisor1 = (v1.x.powi(2) + v1.y.powi(2) + v1.z.powi(2)).sqrt();
+        let divisor2 = (v2.x.powi(2) + v2.y.powi(2) + v2.z.powi(2)).sqrt();
+
+        (dividend / (divisor1 * divisor2)).acos()
+    }
 }
 
 impl std::ops::Add<Vector3D> for Vector3D {

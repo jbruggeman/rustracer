@@ -1,7 +1,7 @@
 {
     "output_image": {
-        "width": 480,
-        "height": 480
+        "width": 1024,
+        "height": 1024
     },
     "camera": {
         "position": {
@@ -43,6 +43,19 @@
                     "z": 1.0
                 },
                 "radius": 0.15
+            },
+            {
+                "color": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 255
+                },
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 1.5
+                },
+                "radius": 0.025
             }
         ],
         "lights": [

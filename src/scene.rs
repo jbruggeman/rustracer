@@ -25,6 +25,18 @@ impl Color {
     }
 }
 
+impl std::ops::Mul<f64> for Color {
+    type Output = Color;
+
+    fn mul(self, scalar: f64) -> Color {
+        Color {
+            r: (self.r as f64 * scalar) as u8,
+            g: (self.g as f64 * scalar) as u8,
+            b: (self.b as f64 * scalar) as u8,
+        }
+    }
+}
+
 #[derive(Deserialize, Debug)]
 pub struct OutputImage {
     pub width: u32,

@@ -85,38 +85,49 @@ pub fn get_closest_sphere(scene: &Scene, ray: &Ray3D) -> Option<Intersection> {
 pub fn compute_color(scene: &Scene, intersection: &Intersection) -> Color {
     let mut light_is_blocked = false;
 
-    for light in &scene.objects.lights {
-        for sphere in &scene.objects.spheres {
-            if sphere == &intersection.sphere {
-                continue;
-            }
+    let light = &scene.objects.lights[0];
 
-            let light_ray = Ray3D {
-                origin: intersection.point,
-                vec: Vector3D::from_point_to_point(&intersection.point, &light.position)
-            };
+    let light_ray = Ray3D {
+        origin: intersection.point,
+        vec: Vector3D::from_point_to_point(&intersection.point, &light.position)
+    };
 
-            //println!("v: {:?}", light_ray);
-
-            match sphere.closest_point_of_intersection(&light_ray) {
-                None => {},
-                Some(sphere_intersect) => {
-                    let intersect_vector = Vector3D::from_point_to_point(&light_ray.origin, &sphere_intersect);
-                    if intersect_vector.length() < light_ray.vec.length() {
-                        light_is_blocked = true;
-                    }
-                }
-            };
+    for sphere in &scene.objects.spheres {
+        if sphere == &intersection.sphere {
+            continue;
         }
+
+        //println!("v: {:?}", light_ray);
+
+        match sphere.closest_point_of_intersection(&light_ray) {
+            None => {},
+            Some(sphere_intersect) => {
+                let intersect_vector = Vector3D::from_point_to_point(&light_ray.origin, &sphere_intersect);
+                if intersect_vector.length() < light_ray.vec.length() {
+                    light_is_blocked = true;
+                }
+            }
+        };
     }
     
     // Hack, compute from multiple light sources.
+    
     if !light_is_blocked {
+        let v1 = Vector3D::from_point_to_point(&intersection.sphere.position, &intersection.point);
+
+        let angle = Vector3D::angle(&v1, &light_ray.vec);
+
+        let mut light_intensity : f64 = 0.0;
+
+        if angle < (std::f64::consts::PI / 2.0) {
+            light_intensity = 1.0 - (angle / (std::f64::consts::PI / 2.0));
+        }
+
         Color {
             r: intersection.sphere.color.r,
             g: intersection.sphere.color.g,
             b: intersection.sphere.color.b
-        }
+        } * light_intensity
     } else {
         Color::black()
     }
