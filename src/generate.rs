@@ -49,6 +49,7 @@ pub struct Intersection {
 }
 
 pub fn closest_point_of_intersection(sphere: &Sphere, ray: &Line3D) -> Option<Point3D> {
+    // TODO: What happens if we intersect behind the camera?
     let cx = sphere.position.x;
     let cy = sphere.position.y;
     let cz = sphere.position.z;
