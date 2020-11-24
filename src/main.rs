@@ -6,7 +6,7 @@ mod scene;
 mod generate;
 
 fn main() {
-    let scene_str = std::fs::read_to_string("scene.json")
+    let scene_str = std::fs::read_to_string("assets/scene.json")
         .expect("Something went wrong reading the file");
 
     let scene = scene::Scene::load_scene_from_json(&scene_str).expect("Error parsing JSON");
