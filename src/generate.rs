@@ -53,29 +53,28 @@ pub fn get_closest_sphere(scene: &Scene, ray: &Ray3D) -> Option<Intersection> {
     let mut closest_sphere = Option::None;
 
     for sphere in &scene.objects.spheres {
-        match sphere.closest_point_of_intersection(&ray) {
-            Some(point) => {
-                match closest_sphere {
-                    None => {
+        let ray_intersections = sphere.points_of_intersection(&ray);
+        if ray_intersections.len() > 0 {
+            let closeset_intersect = &ray_intersections[0];
+            match closest_sphere {
+                None => {
+                    closest_sphere = Option::Some(Intersection {
+                        sphere: *sphere,
+                        point: *closeset_intersect
+                    });
+                },
+                Some(current_closest) => {
+                    let current_point = Vector3D::from_point_to_point(&ray.origin, &current_closest.point);
+                    let new_point = Vector3D::from_point_to_point(&ray.origin, &closeset_intersect);
+
+                    if new_point.length() < current_point.length() {
                         closest_sphere = Option::Some(Intersection {
                             sphere: *sphere,
-                            point: point
+                            point: *closeset_intersect
                         });
-                    },
-                    Some(current_closest) => {
-                        let current_point = Vector3D::from_point_to_point(&ray.origin, &current_closest.point);
-                        let new_point = Vector3D::from_point_to_point(&ray.origin, &point);
-
-                        if new_point.length() < current_point.length() {
-                            closest_sphere = Option::Some(Intersection {
-                                sphere: *sphere,
-                                point: point
-                            });
-                        }
                     }
                 }
-            },
-            None => ()
+            }
         }
     }
 
@@ -99,13 +98,11 @@ pub fn compute_color(scene: &Scene, intersection: &Intersection) -> Color {
 
         //println!("v: {:?}", light_ray);
 
-        match sphere.closest_point_of_intersection(&light_ray) {
-            None => {},
-            Some(sphere_intersect) => {
-                let intersect_vector = Vector3D::from_point_to_point(&light_ray.origin, &sphere_intersect);
-                if intersect_vector.length() < light_ray.vec.length() {
-                    light_is_blocked = true;
-                }
+        let points_of_intersection = sphere.points_of_intersection(&light_ray);
+        if (points_of_intersection.len() > 0) {
+            let intersect_vector = Vector3D::from_point_to_point(&light_ray.origin, &points_of_intersection[0]);
+            if intersect_vector.length() < light_ray.vec.length() {
+                light_is_blocked = true;
             }
         };
     }

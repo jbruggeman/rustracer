@@ -13,7 +13,7 @@ pub struct Sphere {
 }
 
 impl Sphere {
-    pub fn closest_point_of_intersection(&self, ray: &Ray3D) -> Option<Point3D> {
+    pub fn points_of_intersection(&self, ray: &Ray3D) -> Vec<Point3D> {
         let cx = self.position.x;
         let cy = self.position.y;
         let cz = self.position.z;
@@ -42,7 +42,7 @@ impl Sphere {
         let d = b * b - 4.0 * a * c;
     
         if d < 0.0 {
-            return Option::None;
+            return vec![];
         }
 
         let t1 = ( -b - d.sqrt() ) / ( 2.0 * a );
@@ -54,9 +54,9 @@ impl Sphere {
             
         if d == 0.0 {
             if ray.is_point_on_ray(&solution1) {
-                return Option::Some(solution1);
+                return vec![solution1];
             } else {
-                return Option::None;
+                return vec![];
             }
         } 
 
@@ -80,14 +80,14 @@ impl Sphere {
         //println!("solution_2_visible {:?}", solution_2_visible);
 
         if !solution_1_visible && !solution_2_visible {
-            return Option::None;
+            return vec![];
         }
 
         if solution_1_visible && solution_2_visible {
             if sol1_vec3d.length() < sol2_vec3d.length() {
-                return Option::Some(solution1);
+                return vec![solution1, solution2];
             } else {
-                return Option::Some(solution2);
+                return vec![solution2, solution1];
             }
         }
 
