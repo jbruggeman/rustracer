@@ -4,39 +4,11 @@ pub mod point3d;
 pub mod vector3d;
 pub mod ray3d;
 pub mod geometry;
+pub mod color;
 
 use geometry::sphere::Sphere;
 use geometry::plane::Plane;
 use point3d::Point3D;
-
-#[derive(Deserialize, Copy, Clone, Debug, PartialEq, PartialOrd)]
-pub struct Color {
-    pub r: u8,
-    pub g: u8,
-    pub b: u8,
-}
-
-impl Color {
-    pub fn black() -> Color {
-        Color {
-            r: 0,
-            g: 0,
-            b: 0
-        }
-    }
-}
-
-impl std::ops::Mul<f64> for Color {
-    type Output = Color;
-
-    fn mul(self, scalar: f64) -> Color {
-        Color {
-            r: (self.r as f64 * scalar) as u8,
-            g: (self.g as f64 * scalar) as u8,
-            b: (self.b as f64 * scalar) as u8,
-        }
-    }
-}
 
 #[derive(Deserialize, Debug)]
 pub struct OutputImage {
@@ -52,20 +24,12 @@ pub struct Camera {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct Light {
-    pub position: Point3D
-}
-
-#[derive(Deserialize, Debug)]
 pub struct Objects {
     #[serde(default = "Vec::new")]
     pub spheres: Vec<Sphere>,
     
     #[serde(default = "Vec::new")]
-    pub plane: Vec<Plane>,
-    
-    #[serde(default = "Vec::new")]
-    pub lights: Vec<Light>,
+    pub plane: Vec<Plane>
 }
 
 #[derive(Deserialize, Debug)]

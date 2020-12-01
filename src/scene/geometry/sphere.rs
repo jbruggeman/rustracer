@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use super::super::Color;
+use super::super::color::Color;
 use super::super::point3d::Point3D;
 use super::super::ray3d::Ray3D;
 use super::super::vector3d::Vector3D;
@@ -11,7 +11,14 @@ use super::Intersect;
 pub struct Sphere {
     pub color: Color,
     pub position: Point3D,
-    pub radius: f64
+    pub radius: f64,
+    
+    #[serde(default = "zero")]
+    pub light_intensity: f64
+}
+
+fn zero() -> f64 {
+    0.0f64
 }
 
 impl Intersect for Sphere {

@@ -20,7 +20,7 @@ fn main() {
         //if (x == 0 || (x == scene.output_image.width - 1)) && (y == 0 || (y == scene.output_image.height - 1)) {
         //if x == 0 && y == 0 {
        // if x == 240 && y == 240 {
-            let color: scene::Color = generate::compute_pixel_from_scene(&scene, x, y);
+            let color: scene::color::Color = generate::compute_pixel_from_scene(&scene, x, y);
             img.set_pixel(x, y, px!(color.r, color.g, color.b));
         //}
     }

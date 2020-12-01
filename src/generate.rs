@@ -1,7 +1,8 @@
-use super::scene::{Scene, Color, Objects};
+use super::scene::Scene;
 use super::scene::point3d::Point3D;
 use super::scene::vector3d::Vector3D;
 use super::scene::ray3d::Ray3D;
+use super::scene::color::{Color, FloatColor};
 use super::scene::geometry::Intersect;
 use super::scene::geometry::sphere::Sphere;
 
@@ -85,50 +86,53 @@ pub fn get_closest_sphere(scene: &Scene, ray: &Ray3D) -> Option<Intersection> {
 pub fn compute_color(scene: &Scene, intersection: &Intersection) -> Color {
     let mut light_is_blocked = false;
 
-    let light = &scene.objects.lights[0];
+    let mut pixel_color = FloatColor::black();
 
-    let light_ray = Ray3D {
-        origin: intersection.point,
-        vec: Vector3D::from_point_to_point(&intersection.point, &light.position)
-    };
-
-    for sphere in &scene.objects.spheres {
-        if sphere == &intersection.sphere {
+    for &light in &scene.objects.spheres {
+        if light.light_intensity == 0.0f64 {
             continue;
         }
 
-        //println!("v: {:?}", light_ray);
-
-        let points_of_intersection = sphere.intersect(&light_ray);
-        if (points_of_intersection.len() > 0) {
-            let intersect_vector = Vector3D::from_point_to_point(&light_ray.origin, &points_of_intersection[0]);
-            if intersect_vector.length() < light_ray.vec.length() {
-                light_is_blocked = true;
-            }
+        let light_ray = Ray3D {
+            origin: intersection.point,
+            vec: Vector3D::from_point_to_point(&intersection.point, &light.position)
         };
-    }
-    
-    // Hack, compute from multiple light sources.
-    
-    if !light_is_blocked {
-        let v1 = Vector3D::from_point_to_point(&intersection.sphere.position, &intersection.point);
 
-        let angle = Vector3D::angle(&v1, &light_ray.vec);
+        for &sphere in &scene.objects.spheres {
+            if &sphere == &intersection.sphere || &light == &sphere {
+                continue;
+            }
 
-        let mut light_intensity : f64 = 0.0;
+            //println!("v: {:?}", light_ray);
 
-        if angle < (std::f64::consts::PI / 2.0) {
-            light_intensity = 1.0 - (angle / (std::f64::consts::PI / 2.0));
+            let points_of_intersection = sphere.intersect(&light_ray);
+            if points_of_intersection.len() > 0 {
+                let intersect_vector = Vector3D::from_point_to_point(&light_ray.origin, &points_of_intersection[0]);
+                if intersect_vector.length() < light_ray.vec.length() {
+                    light_is_blocked = true;
+                }
+            };
         }
+        
+        if !light_is_blocked {
+            let v1 = Vector3D::from_point_to_point(&intersection.sphere.position, &intersection.point);
 
-        Color {
-            r: intersection.sphere.color.r,
-            g: intersection.sphere.color.g,
-            b: intersection.sphere.color.b
-        } * light_intensity
-    } else {
-        Color::black()
+            let angle = Vector3D::angle(&v1, &light_ray.vec);
+
+            let mut light_angle_intensity : f64 = 0.0;
+
+            if angle < (std::f64::consts::PI / 2.0) {
+                light_angle_intensity = 1.0 - (angle / (std::f64::consts::PI / 2.0));
+            }
+
+            let light_color = light.color.as_float_color() * light.light_intensity * light_angle_intensity;
+
+            pixel_color += light_color * intersection.sphere.color.as_float_color();
+        }
     }
+
+    // Should we bind here?
+    pixel_color.bound().as_color()
 }
 
 pub fn compute_pixel_from_scene(scene: &Scene, x: u32, y: u32) -> Color {
@@ -140,7 +144,7 @@ pub fn compute_pixel_from_scene(scene: &Scene, x: u32, y: u32) -> Color {
             compute_color(&scene, &intersection)
         },
         None => {
-            Color::black()
+            FloatColor::black().as_color()
         }
     }
 }
