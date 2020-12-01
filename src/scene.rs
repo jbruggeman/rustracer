@@ -6,6 +6,7 @@ pub mod ray3d;
 pub mod geometry;
 
 use geometry::sphere::Sphere;
+use geometry::plane::Plane;
 use point3d::Point3D;
 
 #[derive(Deserialize, Copy, Clone, Debug, PartialEq, PartialOrd)]
@@ -57,7 +58,13 @@ pub struct Light {
 
 #[derive(Deserialize, Debug)]
 pub struct Objects {
+    #[serde(default = "Vec::new")]
     pub spheres: Vec<Sphere>,
+    
+    #[serde(default = "Vec::new")]
+    pub plane: Vec<Plane>,
+    
+    #[serde(default = "Vec::new")]
     pub lights: Vec<Light>,
 }
 
