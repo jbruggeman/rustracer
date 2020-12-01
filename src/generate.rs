@@ -53,7 +53,7 @@ pub fn get_closest_sphere(scene: &Scene, ray: &Ray3D) -> Option<Intersection> {
     let mut closest_sphere = Option::None;
 
     for sphere in &scene.objects.spheres {
-        let ray_intersections = sphere.points_of_intersection(&ray);
+        let ray_intersections = sphere.intersect(&ray);
         if ray_intersections.len() > 0 {
             let closeset_intersect = &ray_intersections[0];
             match closest_sphere {
@@ -98,7 +98,7 @@ pub fn compute_color(scene: &Scene, intersection: &Intersection) -> Color {
 
         //println!("v: {:?}", light_ray);
 
-        let points_of_intersection = sphere.points_of_intersection(&light_ray);
+        let points_of_intersection = sphere.intersect(&light_ray);
         if (points_of_intersection.len() > 0) {
             let intersect_vector = Vector3D::from_point_to_point(&light_ray.origin, &points_of_intersection[0]);
             if intersect_vector.length() < light_ray.vec.length() {

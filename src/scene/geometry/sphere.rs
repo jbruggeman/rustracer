@@ -13,7 +13,7 @@ pub struct Sphere {
 }
 
 impl Sphere {
-    pub fn points_of_intersection(&self, ray: &Ray3D) -> Vec<Point3D> {
+    pub fn intersect(&self, ray: &Ray3D) -> Vec<Point3D> {
         let cx = self.position.x;
         let cy = self.position.y;
         let cz = self.position.z;
