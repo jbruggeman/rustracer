@@ -5,6 +5,8 @@ use super::super::point3d::Point3D;
 use super::super::ray3d::Ray3D;
 use super::super::vector3d::Vector3D;
 
+use super::Intersect;
+
 #[derive(Deserialize, Copy, Clone, Debug, PartialEq, PartialOrd)]
 pub struct Sphere {
     pub color: Color,
@@ -12,8 +14,8 @@ pub struct Sphere {
     pub radius: f64
 }
 
-impl Sphere {
-    pub fn intersect(&self, ray: &Ray3D) -> Vec<Point3D> {
+impl Intersect for Sphere {
+    fn intersect(&self, ray: &Ray3D) -> Vec<Point3D> {
         let cx = self.position.x;
         let cy = self.position.y;
         let cz = self.position.z;

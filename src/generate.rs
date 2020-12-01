@@ -2,6 +2,7 @@ use super::scene::{Scene, Color, Objects};
 use super::scene::point3d::Point3D;
 use super::scene::vector3d::Vector3D;
 use super::scene::ray3d::Ray3D;
+use super::scene::geometry::Intersect;
 use super::scene::geometry::sphere::Sphere;
 
 fn get_v_vector(roll: f64) -> Vector3D {
