@@ -84,6 +84,20 @@
                 },
                 "radius": 0.005,
                 "light_intensity": 1.0
+            },
+            {
+                "color": {
+                    "r": 192,
+                    "g": 192,
+                    "b": 64
+                },
+                "position": {
+                    "x": 2.0,
+                    "y": 2.0,
+                    "z": -2.0
+                },
+                "radius": 0.005,
+                "light_intensity": 1.0
             }
         ]
     }
