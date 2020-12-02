@@ -4,3 +4,5 @@ Ray tracer written in rust as an excuse to teach myself some rust. This is defin
 Feel free to borrow anything from this basic implementation.
 
 Executing `cargo run` will build and execute the raytracer, and generate `output.bmp` from `scene.json`
+
+![shiny](https://github.com/jbruggeman/rustracer/blob/master/demo.bmp?raw=true)
