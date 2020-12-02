@@ -84,8 +84,6 @@ pub fn get_closest_sphere(scene: &Scene, ray: &Ray3D) -> Option<Intersection> {
 }  
 
 pub fn compute_color(scene: &Scene, intersection: &Intersection) -> Color {
-    let mut light_is_blocked = false;
-
     let mut pixel_color = FloatColor::black();
 
     for &light in &scene.objects.spheres {
@@ -98,6 +96,7 @@ pub fn compute_color(scene: &Scene, intersection: &Intersection) -> Color {
             vec: Vector3D::from_point_to_point(&intersection.point, &light.position)
         };
 
+        let mut light_is_blocked = false;
         for &sphere in &scene.objects.spheres {
             if &sphere == &intersection.sphere || &light == &sphere {
                 continue;
