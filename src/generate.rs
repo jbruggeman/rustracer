@@ -83,7 +83,7 @@ pub fn get_closest_sphere(scene: &Scene, ray: &Ray3D) -> Option<Intersection> {
     closest_sphere
 }  
 
-pub fn compute_color(scene: &Scene, intersection: &Intersection) -> Color {
+pub fn compute_color(scene: &Scene, intersection: &Intersection) -> FloatColor {
     let mut pixel_color = FloatColor::black();
 
     for &light in &scene.objects.spheres {
@@ -131,10 +131,10 @@ pub fn compute_color(scene: &Scene, intersection: &Intersection) -> Color {
     }
 
     // Should we bind here?
-    pixel_color.bound().as_color()
+    pixel_color
 }
 
-pub fn compute_pixel_from_scene(scene: &Scene, x: u32, y: u32) -> Color {
+pub fn compute_pixel_from_scene(scene: &Scene, x: u32, y: u32) -> FloatColor {
     let ray: Ray3D = compute_ray(&scene, x, y);
     //println!("Debug: {:?}", ray);
     
@@ -143,7 +143,7 @@ pub fn compute_pixel_from_scene(scene: &Scene, x: u32, y: u32) -> Color {
             compute_color(&scene, &intersection)
         },
         None => {
-            FloatColor::black().as_color()
+            FloatColor::black()
         }
     }
 }
