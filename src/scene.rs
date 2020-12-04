@@ -8,6 +8,7 @@ pub mod color;
 
 use geometry::sphere::Sphere;
 use geometry::plane::Plane;
+use geometry::Intersect;
 use point3d::Point3D;
 
 #[derive(Deserialize, Debug)]
@@ -30,6 +31,12 @@ pub struct Objects {
     
     #[serde(default = "Vec::new")]
     pub plane: Vec<Plane>
+}
+
+impl Objects {
+    pub fn geometry(&self) -> std::slice::Iter<'_, Sphere> {
+        self.spheres.iter()
+    }
 }
 
 #[derive(Deserialize, Debug)]

@@ -54,7 +54,7 @@ pub struct Intersection {
 pub fn get_closest_sphere(scene: &Scene, ray: &Ray3D) -> Option<Intersection> {
     let mut closest_sphere = Option::None;
 
-    for sphere in &scene.objects.spheres {
+    for sphere in scene.objects.geometry() {
         let ray_intersections = sphere.intersect(&ray);
         if ray_intersections.len() > 0 {
             let closeset_intersect = &ray_intersections[0];
